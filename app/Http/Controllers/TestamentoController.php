@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Testamento;
-use Facade\FlareClient\Http\Response;
+use Exception;
 use Illuminate\Http\Request;
 
 class TestamentoController extends Controller
@@ -15,7 +15,27 @@ class TestamentoController extends Controller
      */
     public function index()
     {
-        return Testamento::all();
+        try {
+            $testamentos = Testamento::all();
+
+            if (empty($testamentos)) {
+                return Response()->json([
+                    'status' => false,
+                    'message' => 'Nenhum testamento cadastrado!'
+                ], 417);
+            }
+
+            return Response()->json([
+                'status' => true,
+                'testamentos' => $testamentos
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel carregar informações!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -26,7 +46,20 @@ class TestamentoController extends Controller
      */
     public function store(Request $request)
     {
-        return Testamento::create($request->all());
+        try {
+            Testamento::create($request->all());
+
+            return Response()->json([
+                'status' => true,
+                'message' => 'Cadastro efetuado com sucesso!'
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel cadastrar testamento!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -37,7 +70,20 @@ class TestamentoController extends Controller
      */
     public function show($id)
     {
-        return Testamento::findOrFail($id);
+        try {
+            $testamento = Testamento::findOrFail($id);
+
+            return Response()->json([
+                'status' => true,
+                'testamento' => $testamento
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel encontrar testamento!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -49,9 +95,23 @@ class TestamentoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $testamento = Testamento::findOrFail($id);
-        $testamento->update($request->all());
-        return $testamento;
+
+        try {
+            $testamento = Testamento::findOrFail($id);
+            $testamento->update($request->all());
+
+            return Response()->json([
+                'status' => true,
+                'message' => 'Cadastro alterado com sucesso!',
+                'testamento' => $testamento
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel alterar cadastro!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -62,6 +122,26 @@ class TestamentoController extends Controller
      */
     public function destroy($id)
     {
-        return Testamento::destroy($id);
+        try {
+            $deletarTestamento = Testamento::destroy($id);
+
+            if (!$deletarTestamento) {
+                return Response()->json([
+                    'status' => false,
+                    'message' => 'Não foi possivel excluir registro!'
+                ], 417);
+            }
+
+            return Response()->json([
+                'status' => true,
+                'message' => 'Resgistro excluido com sucesso!'
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel excluir cadastro!',
+                'error' => $e
+            ], 500);
+        }
     }
 }

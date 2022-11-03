@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Versiculo;
+use Exception;
 use Illuminate\Http\Request;
 
 class VersiculoController extends Controller
@@ -14,7 +15,27 @@ class VersiculoController extends Controller
      */
     public function index()
     {
-        return Versiculo::all();
+        try {
+            $versiculos = Versiculo::all();
+
+            if (empty($versiculos)) {
+                return Response()->json([
+                    'status' => false,
+                    'message' => 'Nenhum versiculo cadastrado!'
+                ], 417);
+            }
+
+            return Response()->json([
+                'status' => true,
+                'versiculos' => $versiculos
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel carregar informações!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -25,7 +46,20 @@ class VersiculoController extends Controller
      */
     public function store(Request $request)
     {
-        return Versiculo::create($request->all());
+        try {
+            Versiculo::create($request->all());
+
+            return Response()->json([
+                'status' => true,
+                'message' => 'Cadastro efetuado com sucesso!'
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel cadastrar versiculo!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -36,7 +70,20 @@ class VersiculoController extends Controller
      */
     public function show($id)
     {
-        return Versiculo::findOrFail($id);
+        try {
+            $versiculo = Versiculo::findOrFail($id);
+
+            return Response()->json([
+                'status' => true,
+                'versiculo' => $versiculo
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel encontrar versiculo!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -48,9 +95,23 @@ class VersiculoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $versiculo = Versiculo::findOrFail($id);
-        $versiculo->update($request->all());
-        return $versiculo;
+
+        try {
+            $versiculo = Versiculo::findOrFail($id);
+            $versiculo->update($request->all());
+
+            return Response()->json([
+                'status' => true,
+                'message' => 'Cadastro alterado com sucesso!',
+                'versiculo' => $versiculo
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel alterar cadastro!',
+                'error' => $e
+            ], 500);
+        }
     }
 
     /**
@@ -61,6 +122,26 @@ class VersiculoController extends Controller
      */
     public function destroy($id)
     {
-        return Versiculo::destroy($id);
+        try {
+            $deletarVersiculo = Versiculo::destroy($id);
+
+            if (!$deletarVersiculo) {
+                return Response()->json([
+                    'status' => false,
+                    'message' => 'Não foi possivel excluir registro!'
+                ], 417);
+            }
+
+            return Response()->json([
+                'status' => true,
+                'message' => 'Resgistro excluido com sucesso!'
+            ]);
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => false,
+                'message' => 'Não foi possivel excluir cadastro!',
+                'error' => $e
+            ], 500);
+        }
     }
 }
