@@ -75,7 +75,8 @@ class TestamentoController extends Controller
 
             return Response()->json([
                 'status' => true,
-                'testamento' => $testamento
+                'testamento' => $testamento,
+                'livros' => $testamento->livros
             ]);
         } catch (Exception $e) {
             return Response()->json([

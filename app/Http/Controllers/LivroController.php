@@ -75,7 +75,9 @@ class LivroController extends Controller
 
             return Response()->json([
                 'status' => true,
-                'livro' => $livro
+                'livro' => $livro,
+                'testamento' => $livro->testamento,
+                'versiculos' => $livro->versiculos
             ]);
         } catch (Exception $e) {
             return Response()->json([
